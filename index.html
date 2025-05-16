@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Offer Wall | Earn Rewards</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #6c5ce7;
+            --secondary-color: #a29bfe;
+            --accent-color: #fd79a8;
+            --dark-color: #2d3436;
+            --light-color: #f5f6fa;
+            --success-color: #00b894;
+            --warning-color: #fdcb6e;
+            --error-color: #d63031;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: var(--dark-color);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+        
+        .logo span {
+            color: var(--accent-color);
+        }
+        
+        .user-info {
+            position: absolute;
+            top: 0;
+            right: 0;
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 0.75rem;
+        }
+        
+        .points-balance {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #636e72;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            line-height: 1.6;
+        }
+        
+        .offer-wall-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .offer-wall-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .offer-wall-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .offer-count {
+            background: white;
+            color: var(--primary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        
+        #offer-wall-content {
+            padding: 2rem;
+            min-height: 500px;
+            position: relative;
+        }
+        
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 300px;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--secondary-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+        
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+        
+        .modal-icon {
+            font-size: 3rem;
+            color: var(--error-color);
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+        
+        .modal-message {
+            color: #636e72;
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
+        
+        .modal-button {
+            display: inline-block;
+            padding: 0.75rem 2rem;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-button:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            color: #636e72;
+            font-size: 0.9rem;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        
+        .footer-link {
+            margin: 0 1rem;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* Style the offer wall elements */
+        #offer-wall-content .offer-item {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border: 1px solid #eee;
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        #offer-wall-content .offer-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        #offer-wall-content .offer-image {
+            width: 100px;
+            height: 100px;
+            border-radius: 10px;
+            background-size: cover;
+            background-position: center;
+            margin-right: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        #offer-wall-content .offer-details {
+            flex-grow: 1;
+        }
+        
+        #offer-wall-content .offer-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark-color);
+        }
+        
+        #offer-wall-content .offer-description {
+            color: #636e72;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+        
+        #offer-wall-content .offer-reward {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        #offer-wall-content .offer-button {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        #offer-wall-content .offer-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
+        }
+        
+        #offer-wall-content .offer-button.completed {
+            background: var(--success-color);
+            cursor: default;
+        }
+        
+        #offer-wall-content .offer-button.disabled {
+            background: #b2bec3;
+            cursor: not-allowed;
+        }
+        
+        @media (max-width: 768px) {
+            .user-info {
+                position: static;
+                margin: 0 auto 1.5rem;
+                justify-content: center;
+            }
+            
+            #offer-wall-content .offer-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            #offer-wall-content .offer-image {
+                margin-right: 0;
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">Offer<span>Wall</span></div>
+            <div class="user-info">
+                <div class="user-avatar">JS</div>
+                <div class="points-balance">5,250 Points</div>
+            </div>
+            <h1>Complete Offers & Earn Rewards</h1>
+            <p class="subtitle">Complete simple tasks from our partners and get rewarded with points that you can redeem for amazing prizes.</p>
+        </header>
+        
+        <div class="offer-wall-container">
+            <div class="offer-wall-header">
+                <div class="offer-wall-title">Available Offers</div>
+                <div class="offer-count" id="offerCount">Loading...</div>
+            </div>
+            
+            <div id="offer-wall-content">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <div class="footer-links">
+                <a href="#" class="footer-link">Terms of Service</a>
+                <a href="#" class="footer-link">Privacy Policy</a>
+                <a href="#" class="footer-link">Support</a>
+                <a href="#" class="footer-link">FAQ</a>
+            </div>
+            <p>© 2023 Premium Offer Wall. All rights reserved.</p>
+        </footer>
+    </div>
+    
+    <div class="modal-overlay" id="limitModal">
+        <div class="modal">
+            <div class="modal-icon">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <h3 class="modal-title">Daily Limit Reached</h3>
+            <p class="modal-message">You've reached your daily limit of 3 offers. Please try again after 24 hours.</p>
+            <a href="#" class="modal-button" id="closeModal">OK</a>
+        </div>
+    </div>
+    
+    <script>
+        // Track completed offers and click count
+        if (!localStorage.getItem('completedOffers')) {
+            localStorage.setItem('completedOffers', JSON.stringify([]));
+        }
+        
+        if (!localStorage.getItem('offerClicks')) {
+            localStorage.setItem('offerClicks', '0');
+        }
+        
+        if (!localStorage.getItem('lastOfferDate')) {
+            localStorage.setItem('lastOfferDate', new Date().toISOString());
+        }
+        
+        // Function to check if 24 hours have passed since last offer
+        function isNewDay() {
+            const now = new Date();
+            const lastDate = new Date(localStorage.getItem('lastOfferDate'));
+            const hoursSinceLastOffer = (now - lastDate) / (1000 * 60 * 60);
+            return hoursSinceLastOffer >= 24;
+        }
+        
+        // Function to reset daily counters if it's a new day
+        function checkDailyReset() {
+            if (isNewDay()) {
+                localStorage.setItem('offerClicks', '0');
+                localStorage.setItem('lastOfferDate', new Date().toISOString());
+            }
+        }
+        
+        // Function to handle offer clicks
+        function handleOfferClick(event) {
+            checkDailyReset();
+            
+            const currentClicks = parseInt(localStorage.getItem('offerClicks'));
+            
+            if (currentClicks >= 3) {
+                // Show limit modal
+                document.getElementById('limitModal').classList.add('active');
+                event.preventDefault();
+                return false;
+            }
+            
+            // Increment click counter
+            localStorage.setItem('offerClicks', (currentClicks + 1).toString());
+            localStorage.setItem('lastOfferDate', new Date().toISOString());
+            
+            // Get offer ID from the clicked button
+            const offerId = event.target.closest('[data-offer-id]').getAttribute('data-offer-id');
+            
+            // Add to completed offers
+            const completedOffers = JSON.parse(localStorage.getItem('completedOffers'));
+            if (!completedOffers.includes(offerId)) {
+                completedOffers.push(offerId);
+                localStorage.setItem('completedOffers', JSON.stringify(completedOffers));
+            }
+            
+            return true;
+        }
+        
+        // Function to style the offer wall content after it loads
+        function styleOfferWall() {
+            const offerItems = document.querySelectorAll('#offer-wall-content .offer-item');
+            const completedOffers = JSON.parse(localStorage.getItem('completedOffers'));
+            
+            offerItems.forEach(item => {
+                const offerId = item.getAttribute('data-offer-id');
+                const button = item.querySelector('.offer-button');
+                
+                if (completedOffers.includes(offerId)) {
+                    button.classList.add('completed');
+                    button.textContent = 'Completed';
+                    button.onclick = null;
+                } else {
+                    button.onclick = handleOfferClick;
+                }
+            });
+            
+            // Update offer count
+            document.getElementById('offerCount').textContent = `${offerItems.length} Offers`;
+            
+            // Hide loading spinner
+            document.querySelector('.loading-spinner').style.display = 'none';
+        }
+        
+        // Close modal
+        document.getElementById('closeModal').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('limitModal').classList.remove('active');
+        });
+        
+        // Initialize the offer wall
+        document.addEventListener('DOMContentLoaded', function() {
+            checkDailyReset();
+            
+            // Load the external offer wall script
+            const script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = 'https://installfebruary.com/script_include.php?id=1808965';
+            
+            // Add callback for when the offer wall loads
+            script.onload = function() {
+                // The offer wall script should populate #offer-wall-content
+                // We'll check periodically until it does
+                const checkInterval = setInterval(() => {
+                    if (document.querySelectorAll('#offer-wall-content .offer-item').length > 0) {
+                        clearInterval(checkInterval);
+                        styleOfferWall();
+                    }
+                }, 500);
+            };
+            
+            document.body.appendChild(script);
+        });
+    </script>
+</body>
+</html>
